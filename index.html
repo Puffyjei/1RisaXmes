@@ -156,12 +156,16 @@
         const user = localStorage.getItem("loggedInUser");
         if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
         const ultima = localStorage.getItem("chiste_enviado_" + user);
-        if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
-          alert("Solo puedes enviar un chiste por semana.");
-        } else {
+       if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
+        alert("Solo puedes enviar un chiste por semana.");
+       } else {
           document.getElementById("modal").style.display = "flex";
+         }
         }
-      }
+       if (valor === "ver") {
+        mostrarChistes(); // <- nueva función
+  }
+}
     }
 
     function enviarChiste() {
@@ -182,7 +186,27 @@
     // Autologin
     window.onload = () => {
       const user = localStorage.getItem("loggedInUser");
-      if (user) mostrarBienvenida(user);
+      if (user) mostrarBienvenida(user);function mostrarChistes() {
+  const user = localStorage.getItem("loggedInUser");
+  if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
+
+  const ul = document.getElementById("chistes-ul");
+  ul.innerHTML = ""; // Limpiar anteriores
+  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+
+  if (todos.length === 0) {
+    ul.innerHTML = "<li>No hay chistes enviados aún.</li>";
+  } else {
+    todos.forEach(item => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${item.user}:</strong> ${item.texto}`;
+      li.style.padding = "0.5rem 0";
+      ul.appendChild(li);
+    });
+  }
+
+  document.getElementById("lista-chistes").style.display = "block";
+        }
     };
   </script>
 </body>
