@@ -3,177 +3,187 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>El chiste del mes</title>
+  <title>1chisteXmes</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(135deg, #ffecd2, #fcb69f);
+      font-family: sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      text-align: center;
-      color: #333;
+      padding: 1rem;
+      background-color: #f4f4f4;
     }
 
     .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      gap: 2rem;
+    }
+
+    .main {
+      flex: 2;
+      text-align: center;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
       padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .joke {
-      font-size: 1.3rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    button {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: none;
       border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    .copy-btn {
-      background-color: #fdd835;
+    .sidebar {
+      flex: 1;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    .copy-btn:hover {
-      background-color: #fbc02d;
+    input, button, textarea {
+      margin-top: 0.5rem;
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
-    .vote-btn {
+    nav {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 1rem;
+      background: #222;
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.4rem;
-      background-color: #eeeeee;
     }
 
-    .vote-btn:hover {
-      background-color: #e0e0e0;
+    .menu select {
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
     }
 
-    .footer {
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-      100% { transform: translateY(0); }
+    @media (max-width: 700px) {
+      .container {
+        flex-direction: column;
+        gap: 1rem;
+      }
     }
   </style>
 </head>
 <body>
+  <nav>
+    <div><strong>1chisteXmes</strong></div>
+    <div class="menu">
+      <select onchange="manejarMenu(this.value)">
+        <option value="">☰ Menú</option>
+        <option value="enviar">Enviar un chiste</option>
+        <option value="salir">Cerrar sesión</option>
+      </select>
+    </div>
+  </nav>
+
   <div class="container">
-    <h1>😂 El chiste del mes 😂</h1>
-    <div id="joke" class="joke">
-      —¿Cuál es el animal más antiguo?<br>
-      —La cebra... porque está en blanco y negro.
+    <!-- Chiste del mes -->
+    <div class="main">
+      <h1>😄 Chiste del mes</h1>
+      <p>¿Por qué los pájaros no usan Facebook?<br>Porque ya tienen Twitter.</p>
     </div>
 
-    <div class="buttons">
-      <button class="copy-btn" onclick="copiarChiste()">📋 Copiar</button>
+    <!-- Autenticación -->
+    <div class="sidebar">
+      <div id="auth-forms">
+        <h2>Inicia sesión o regístrate</h2>
+        <input type="text" id="username" placeholder="Usuario" />
+        <input type="password" id="password" placeholder="Contraseña" />
+        <button onclick="registrarse()">Registrarse</button>
+        <button onclick="iniciarSesion()">Iniciar sesión</button>
+      </div>
+      <div id="auth-message" style="color: green; margin-top: 1rem;"></div>
     </div>
+  </div>
 
-    <div class="buttons">
-      <button class="vote-btn" onclick="votar('up')">👍 <span id="upvotes">0</span></button>
-      <button class="vote-btn" onclick="votar('down')">👎 <span id="downvotes">0</span></button>
-    </div>
-
-    <div class="footer">
-      ¡Vuelve el próximo mes para otro chiste!
+  <!-- Modal para enviar chiste -->
+  <div id="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; width: 90%;">
+      <h2>📝 Enviar tu chiste</h2>
+      <textarea id="nuevo-chiste" rows="4" placeholder="Escribe tu chiste aquí..."></textarea>
+      <button onclick="enviarChiste()">Enviar</button>
+      <button onclick="cerrarModal()" style="margin-top: 0.5rem;">Cancelar</button>
+      <p id="chiste-status" style="color: green;"></p>
     </div>
   </div>
 
   <script>
-    function copiarChiste() {
-      const chiste = document.getElementById('joke').innerText;
-      navigator.clipboard.writeText(chiste).then(() => {
-        alert("¡Chiste copiado al portapapeles!");
-      });
+    function registrarse() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (!user || !pass) return alert("Completa ambos campos.");
+      if (localStorage.getItem("user_" + user)) return alert("Usuario ya existe.");
+      localStorage.setItem("user_" + user, pass);
+      alert("Registrado correctamente.");
     }
 
-    let votos = { up: 0, down: 0 };
-
-    function votar(tipo) {
-      votos[tipo]++;
-      document.getElementById(tipo + 'votes').innerText = votos[tipo];
+    function iniciarSesion() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const stored = localStorage.getItem("user_" + user);
+      if (stored === pass) {
+        localStorage.setItem("loggedInUser", user);
+        mostrarBienvenida(user);
+      } else {
+        alert("Credenciales incorrectas.");
+      }
     }
+
+    function mostrarBienvenida(user) {
+      document.getElementById("auth-forms").style.display = "none";
+      document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
+    }
+
+    function manejarMenu(valor) {
+      if (valor === "salir") {
+        localStorage.removeItem("loggedInUser");
+        location.reload();
+      }
+      if (valor === "enviar") {
+        const user = localStorage.getItem("loggedInUser");
+        if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
+        const ultima = localStorage.getItem("chiste_enviado_" + user);
+        if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
+          alert("Solo puedes enviar un chiste por semana.");
+        } else {
+          document.getElementById("modal").style.display = "flex";
+        }
+      }
+    }
+
+    function enviarChiste() {
+      const user = localStorage.getItem("loggedInUser");
+      const texto = document.getElementById("nuevo-chiste").value.trim();
+      if (!texto) return alert("Escribe un chiste.");
+      localStorage.setItem("chiste_enviado_" + user, Date.now());
+      document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
+      setTimeout(() => cerrarModal(), 1500);
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").style.display = "none";
+      document.getElementById("nuevo-chiste").value = "";
+      document.getElementById("chiste-status").innerText = "";
+    }
+
+    // Autologin
+    window.onload = () => {
+      const user = localStorage.getItem("loggedInUser");
+      if (user) mostrarBienvenida(user);
+    };
   </script>
-<!-- Pega esto al final del <body> antes del </body> -->
-<div id="auth-section" style="margin-top: 2rem; font-size: 0.9rem;">
-  <div id="auth-forms">
-    <h2>🔐 Inicia sesión o regístrate</h2>
-    <input type="text" id="username" placeholder="Nombre de usuario" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;" />
-    <input type="password" id="password" placeholder="Contraseña" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc; margin-left: 0.5rem;" />
-    <br><br>
-    <button onclick="registrarse()" style="padding: 0.5rem 1rem; margin-right: 0.5rem;">Registrarse</button>
-    <button onclick="iniciarSesion()" style="padding: 0.5rem 1rem;">Iniciar sesión</button>
-  </div>
-  <div id="auth-message" style="margin-top: 1rem; color: green;"></div>
-</div>
-
-<script>
-  function registrarse() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    if (!user || !pass) {
-      alert("Por favor ingresa un usuario y contraseña.");
-      return;
-    }
-    if (localStorage.getItem("user_" + user)) {
-      alert("Ese usuario ya existe.");
-      return;
-    }
-    localStorage.setItem("user_" + user, pass);
-    alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
-  }
-
-  function iniciarSesion() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    const stored = localStorage.getItem("user_" + user);
-    if (stored === pass) {
-      localStorage.setItem("loggedInUser", user);
-      mostrarMensajeBienvenida(user);
-    } else {
-      alert("Usuario o contraseña incorrectos.");
-    }
-  }
-
-  function mostrarMensajeBienvenida(usuario) {
-    document.getElementById("auth-forms").style.display = "none";
-    document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${usuario}.`;
-  }
-
-  // Mostrar mensaje si ya está logueado
-  window.onload = function() {
-    const user = localStorage.getItem("loggedInUser");
-    if (user) {
-      mostrarMensajeBienvenida(user);
-    }
-  }
-</script>
 </body>
 </html>
