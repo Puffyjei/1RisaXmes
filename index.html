@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>El chiste del mes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ffecd2, #fcb69f);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .joke {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn {
+      background-color: #fdd835;
+    }
+
+    .copy-btn:hover {
+      background-color: #fbc02d;
+    }
+
+    .vote-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: #eeeeee;
+    }
+
+    .vote-btn:hover {
+      background-color: #e0e0e0;
+    }
+
+    .footer {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>😂 El chiste del mes 😂</h1>
+    <div id="joke" class="joke">
+      —¿Cuál es el animal más antiguo?<br>
+      —La cebra... porque está en blanco y negro.
+    </div>
+
+    <div class="buttons">
+      <button class="copy-btn" onclick="copiarChiste()">📋 Copiar</button>
+    </div>
+
+    <div class="buttons">
+      <button class="vote-btn" onclick="votar('up')">👍 <span id="upvotes">0</span></button>
+      <button class="vote-btn" onclick="votar('down')">👎 <span id="downvotes">0</span></button>
+    </div>
+
+    <div class="footer">
+      ¡Vuelve el próximo mes para otro chiste!
+    </div>
+  </div>
+
+  <script>
+    function copiarChiste() {
+      const chiste = document.getElementById('joke').innerText;
+      navigator.clipboard.writeText(chiste).then(() => {
+        alert("¡Chiste copiado al portapapeles!");
+      });
+    }
+
+    let votos = { up: 0, down: 0 };
+
+    function votar(tipo) {
+      votos[tipo]++;
+      document.getElementById(tipo + 'votes').innerText = votos[tipo];
+    }
+  </script>
+<!-- Pega esto al final del <body> antes del </body> -->
+<div id="auth-section" style="margin-top: 2rem; font-size: 0.9rem;">
+  <div id="auth-forms">
+    <h2>🔐 Inicia sesión o regístrate</h2>
+    <input type="text" id="username" placeholder="Nombre de usuario" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;" />
+    <input type="password" id="password" placeholder="Contraseña" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc; margin-left: 0.5rem;" />
+    <br><br>
+    <button onclick="registrarse()" style="padding: 0.5rem 1rem; margin-right: 0.5rem;">Registrarse</button>
+    <button onclick="iniciarSesion()" style="padding: 0.5rem 1rem;">Iniciar sesión</button>
+  </div>
+  <div id="auth-message" style="margin-top: 1rem; color: green;"></div>
+</div>
+
+<script>
+  function registrarse() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if (!user || !pass) {
+      alert("Por favor ingresa un usuario y contraseña.");
+      return;
+    }
+    if (localStorage.getItem("user_" + user)) {
+      alert("Ese usuario ya existe.");
+      return;
+    }
+    localStorage.setItem("user_" + user, pass);
+    alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+  }
+
+  function iniciarSesion() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const stored = localStorage.getItem("user_" + user);
+    if (stored === pass) {
+      localStorage.setItem("loggedInUser", user);
+      mostrarMensajeBienvenida(user);
+    } else {
+      alert("Usuario o contraseña incorrectos.");
+    }
+  }
+
+  function mostrarMensajeBienvenida(usuario) {
+    document.getElementById("auth-forms").style.display = "none";
+    document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${usuario}.`;
+  }
+
+  // Mostrar mensaje si ya está logueado
+  window.onload = function() {
+    const user = localStorage.getItem("loggedInUser");
+    if (user) {
+      mostrarMensajeBienvenida(user);
+    }
+  }
+</script>
+</body>
+</html>
