@@ -92,6 +92,11 @@
       <h1>😄 Chiste del mes</h1>
       <p>¿Por qué los pájaros no usan Facebook?<br>Porque ya tienen Twitter.</p>
     </div>
+    <!-- Sección para mostrar chistes -->
+    <div id="seccion-chistes" style="display: none; width: 100%; max-width: 900px; margin-top: 2rem;">
+     <h2>📚 Chistes enviados</h2>
+    <div id="chistes-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+   </div>
 
     <!-- Autenticación -->
     <div class="sidebar">
@@ -186,37 +191,64 @@
   }
 
   function mostrarChistes() {
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
+  const user = localStorage.getItem("loggedInUser");
+  if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
 
-    let lista = document.getElementById("lista-chistes");
-    if (!lista) {
-      lista = document.createElement("div");
-      lista.id = "lista-chistes";
-      lista.innerHTML = `
-        <h2>📚 Chistes enviados</h2>
-        <ul id="chistes-ul" style="padding-left: 1rem;"></ul>
+  const contenedor = document.getElementById("seccion-chistes");
+  const lista = document.getElementById("chistes-lista");
+  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+
+  lista.innerHTML = ""; // Vaciar antes de volver a mostrar
+
+  if (todos.length === 0) {
+    lista.innerHTML = "<p>No hay chistes enviados aún.</p>";
+  } else {
+    todos.forEach((item, index) => {
+      const tarjeta = document.createElement("div");
+      tarjeta.style.background = "white";
+      tarjeta.style.padding = "1rem";
+      tarjeta.style.borderRadius = "10px";
+      tarjeta.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+      tarjeta.style.position = "relative";
+
+      tarjeta.innerHTML = `
+        <strong>${item.user}</strong>
+        <p style="margin-top: 0.5rem;">${item.texto}</p>
       `;
-      document.body.appendChild(lista);
-    }
 
-    const ul = document.getElementById("chistes-ul");
-    ul.innerHTML = "";
-    const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+      // Si el chiste es del usuario actual, mostrar botón de eliminar
+      if (item.user === user) {
+        const btn = document.createElement("button");
+        btn.innerText = "🗑️ Eliminar";
+        btn.style.position = "absolute";
+        btn.style.top = "1rem";
+        btn.style.right = "1rem";
+        btn.style.background = "#f44336";
+        btn.style.color = "white";
+        btn.style.border = "none";
+        btn.style.padding = "0.4rem 0.7rem";
+        btn.style.borderRadius = "5px";
+        btn.style.cursor = "pointer";
 
-    if (todos.length === 0) {
-      ul.innerHTML = "<li>No hay chistes enviados aún.</li>";
-    } else {
-      todos.forEach(item => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${item.user}:</strong> ${item.texto}`;
-        li.style.padding = "0.5rem 0";
-        ul.appendChild(li);
-      });
-    }
+        btn.onclick = () => eliminarChiste(index);
 
-    lista.style.display = "block";
+        tarjeta.appendChild(btn);
+      }
+
+      lista.appendChild(tarjeta);
+    });
   }
+
+  contenedor.style.display = "block";
+      }
+function eliminarChiste(index) {
+  if (!confirm("¿Seguro que quieres eliminar este chiste?")) return;
+
+  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+  todos.splice(index, 1); // Eliminar el chiste
+  localStorage.setItem("chistes_enviados", JSON.stringify(todos));
+  mostrarChistes(); // Recargar vista
+    }
 
   window.onload = () => {
     const user = localStorage.getItem("loggedInUser");
