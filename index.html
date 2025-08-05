@@ -121,93 +121,110 @@
   </div>
 
   <script>
-    function registrarse() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      if (!user || !pass) return alert("Completa ambos campos.");
-      if (localStorage.getItem("user_" + user)) return alert("Usuario ya existe.");
-      localStorage.setItem("user_" + user, pass);
-      alert("Registrado correctamente.");
-    }
+  function registrarse() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if (!user || !pass) return alert("Completa ambos campos.");
+    if (localStorage.getItem("user_" + user)) return alert("Usuario ya existe.");
+    localStorage.setItem("user_" + user, pass);
+    alert("Registrado correctamente.");
+  }
 
-    function iniciarSesion() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      const stored = localStorage.getItem("user_" + user);
-      if (stored === pass) {
-        localStorage.setItem("loggedInUser", user);
-        mostrarBienvenida(user);
-      } else {
-        alert("Credenciales incorrectas.");
-      }
+  function iniciarSesion() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const stored = localStorage.getItem("user_" + user);
+    if (stored === pass) {
+      localStorage.setItem("loggedInUser", user);
+      mostrarBienvenida(user);
+    } else {
+      alert("Credenciales incorrectas.");
     }
+  }
 
-    function mostrarBienvenida(user) {
-      document.getElementById("auth-forms").style.display = "none";
-      document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
+  function mostrarBienvenida(user) {
+    document.getElementById("auth-forms").style.display = "none";
+    document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
+  }
+
+  function manejarMenu(valor) {
+    if (valor === "salir") {
+      localStorage.removeItem("loggedInUser");
+      location.reload();
     }
-
-    function manejarMenu(valor) {
-      if (valor === "salir") {
-        localStorage.removeItem("loggedInUser");
-        location.reload();
-      }
-      if (valor === "enviar") {
-        const user = localStorage.getItem("loggedInUser");
-        if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
-        const ultima = localStorage.getItem("chiste_enviado_" + user);
-       if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
+    if (valor === "enviar") {
+      const user = localStorage.getItem("loggedInUser");
+      if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
+      const ultima = localStorage.getItem("chiste_enviado_" + user);
+      if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
         alert("Solo puedes enviar un chiste por semana.");
-       } else {
-          document.getElementById("modal").style.display = "flex";
-         }
-        }
-       if (valor === "ver") {
-        mostrarChistes(); // <- nueva función
-  }
-}
+      } else {
+        document.getElementById("modal").style.display = "flex";
+      }
     }
-
-    function enviarChiste() {
-      const user = localStorage.getItem("loggedInUser");
-      const texto = document.getElementById("nuevo-chiste").value.trim();
-      if (!texto) return alert("Escribe un chiste.");
-      localStorage.setItem("chiste_enviado_" + user, Date.now());
-      document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
-      setTimeout(() => cerrarModal(), 1500);
+    if (valor === "ver") {
+      mostrarChistes();
     }
-
-    function cerrarModal() {
-      document.getElementById("modal").style.display = "none";
-      document.getElementById("nuevo-chiste").value = "";
-      document.getElementById("chiste-status").innerText = "";
-    }
-
-    // Autologin
-    window.onload = () => {
-      const user = localStorage.getItem("loggedInUser");
-      if (user) mostrarBienvenida(user);function mostrarChistes() {
-  const user = localStorage.getItem("loggedInUser");
-  if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
-
-  const ul = document.getElementById("chistes-ul");
-  ul.innerHTML = ""; // Limpiar anteriores
-  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
-
-  if (todos.length === 0) {
-    ul.innerHTML = "<li>No hay chistes enviados aún.</li>";
-  } else {
-    todos.forEach(item => {
-      const li = document.createElement("li");
-      li.innerHTML = `<strong>${item.user}:</strong> ${item.texto}`;
-      li.style.padding = "0.5rem 0";
-      ul.appendChild(li);
-    });
   }
 
-  document.getElementById("lista-chistes").style.display = "block";
-        }
-    };
-  </script>
+  function enviarChiste() {
+    const user = localStorage.getItem("loggedInUser");
+    const texto = document.getElementById("nuevo-chiste").value.trim();
+    if (!texto) return alert("Escribe un chiste.");
+    localStorage.setItem("chiste_enviado_" + user, Date.now());
+
+    // Guardar en lista de chistes
+    const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+    todos.push({ user, texto });
+    localStorage.setItem("chistes_enviados", JSON.stringify(todos));
+
+    document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
+    setTimeout(() => cerrarModal(), 1500);
+  }
+
+  function cerrarModal() {
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("nuevo-chiste").value = "";
+    document.getElementById("chiste-status").innerText = "";
+  }
+
+  function mostrarChistes() {
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
+
+    let lista = document.getElementById("lista-chistes");
+    if (!lista) {
+      lista = document.createElement("div");
+      lista.id = "lista-chistes";
+      lista.innerHTML = `
+        <h2>📚 Chistes enviados</h2>
+        <ul id="chistes-ul" style="padding-left: 1rem;"></ul>
+      `;
+      document.body.appendChild(lista);
+    }
+
+    const ul = document.getElementById("chistes-ul");
+    ul.innerHTML = "";
+    const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+
+    if (todos.length === 0) {
+      ul.innerHTML = "<li>No hay chistes enviados aún.</li>";
+    } else {
+      todos.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${item.user}:</strong> ${item.texto}`;
+        li.style.padding = "0.5rem 0";
+        ul.appendChild(li);
+      });
+    }
+
+    lista.style.display = "block";
+  }
+
+  window.onload = () => {
+    const user = localStorage.getItem("loggedInUser");
+    if (user) mostrarBienvenida(user);
+  };
+   </script>
 </body>
 </html>
