@@ -79,16 +79,13 @@
 </head>
 <body>
   <nav>
-    <div><strong>1chisteXmes</strong></div>
-    <div class="menu">
-      <select onchange="manejarMenu(this.value)">
-        <option value="">☰ Menú</option>
-        <option value="enviar">Enviar un chiste</option>
-        <option value="salir">Cerrar sesión</option>
-      </select>
-    </div>
+    <select onchange="manejarMenu(this.value)">
+     <option value="">☰ Menú</option>
+     <option value="enviar">Enviar un chiste</option>
+     <option value="ver">Ver chistes enviados</option>
+     <option value="salir">Cerrar sesión</option>
+</select>
   </nav>
-
   <div class="container">
     <!-- Chiste del mes -->
     <div class="main">
