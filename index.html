@@ -83,6 +83,7 @@
      <option value="">☰ Menú</option>
      <option value="enviar">Enviar un chiste</option>
      <option value="ver">Ver chistes enviados</option>
+     <option value="comunidad">Ver chistes de la comunidad</option>
      <option value="salir">Cerrar sesión</option>
 </select>
   </nav>
@@ -154,25 +155,32 @@
     document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
   }
 
-  function manejarMenu(valor) {
-    if (valor === "salir") {
-      localStorage.removeItem("loggedInUser");
-      location.reload();
-    }
-    if (valor === "enviar") {
-      const user = localStorage.getItem("loggedInUser");
-      if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
-      const ultima = localStorage.getItem("chiste_enviado_" + user);
-      if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
-        alert("Solo puedes enviar un chiste por semana.");
-      } else {
-        document.getElementById("modal").style.display = "flex";
-      }
-    }
-    if (valor === "ver") {
-      mostrarChistes();
+ function manejarMenu(valor) {
+  document.getElementById("seccion-chistes").style.display = "none";
+  document.getElementById("comunidad-chistes").style.display = "none";
+
+  if (valor === "salir") {
+    localStorage.removeItem("loggedInUser");
+    location.reload();
+  }
+  if (valor === "enviar") {
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
+    const ultima = localStorage.getItem("chiste_enviado_" + user);
+    if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
+      alert("Solo puedes enviar un chiste por semana.");
+    } else {
+      document.getElementById("modal").style.display = "flex";
     }
   }
+  if (valor === "ver") {
+    mostrarChistes();
+  }
+  if (valor === "comunidad") {
+    mostrarComunidad();
+  }
+}
+
 
   function enviarChiste() {
   const user = localStorage.getItem("loggedInUser");
@@ -267,11 +275,38 @@ function eliminarChiste(index) {
   localStorage.setItem("chistes_enviados", JSON.stringify(todos));
   mostrarChistes(); // Recargar vista
     }
+function mostrarComunidad() {
+  const contenedor = document.getElementById("comunidad-chistes");
+  const lista = document.getElementById("comunidad-lista");
+  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+
+  lista.innerHTML = "";
+
+  if (todos.length === 0) {
+    lista.innerHTML = "<p>Aún no hay chistes en la comunidad.</p>";
+  } else {
+    todos.forEach(item => {
+      const tarjeta = document.createElement("div");
+      tarjeta.style.background = "white";
+      tarjeta.style.padding = "1rem";
+      tarjeta.style.borderRadius = "10px";
+      tarjeta.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+      tarjeta.innerHTML = `
+        <strong>${item.user}</strong>
+        <p style="margin-top: 0.5rem;">${item.texto}</p>
+      `;
+      lista.appendChild(tarjeta);
+    });
+  }
+
+  contenedor.style.display = "block";
+}
 
   window.onload = () => {
     const user = localStorage.getItem("loggedInUser");
     if (user) mostrarBienvenida(user);
   };
+    
    </script>
 </body>
 </html>
