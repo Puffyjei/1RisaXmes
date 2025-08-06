@@ -17,24 +17,64 @@
       background-color: #f4f4f4;
     }
 
-    /* Barra lateral */
-    aside {
-      width: 200px;
-      background: #222;
+    /* Botón ☰ */
+    .menu-button {
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px; /* Oculto al inicio */
+      width: 250px;
+      height: 100%;
+      background-color: #333;
       color: white;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 40px;
+    }
+    
+    .sidebar li {
+      margin-bottom: 20px;
+    }
+    
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.2em;
+    }
+    
+    .sidebar.open {
+      left: 0;
+    }
+    
+    .close-button {
+      font-size: 2em;
+      background: none;
+      border: none;
+      color: white;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
     }
 
-    aside select {
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
-      width: 100%;
-    }
 
     main {
       flex: 1;
@@ -95,57 +135,53 @@
   </style>
 </head>
 <body>
-  <!-- Barra lateral -->
-  <aside>
-    <select onchange="manejarMenu(this.value)">
-      <option value="">☰ Menú</option>
-      <option value="inicio">Inicio</option>
-      <option value="enviar">Enviar un chiste</option>
-      <option value="ver">Ver chistes enviados</option>
-      <option value="salir">Cerrar sesión</option>
-    </select>
-  </aside>
+    <header>
+        <h1>1RisaXMes</h1>
+        <button id="menuToggle" class="menu-button">☰</button>
+    </header>
 
-  <main>
-    <!-- Chiste del mes (siempre visible) -->
-    <div id="inicio" class="main-box">
-      <h1>😄 Chiste del mes</h1>
-      <p>¿Por qué los pájaros no usan Facebook?<br>Porque ya tienen Twitter.</p>
-    </div>
+    <!-- Sidebar lateral -->
+    <nav id="sidebarMenu" class="sidebar">
+        <button id="closeSidebar" class="close-button">×</button>
+        <ul>
+            <li><a href="#" onclick="mostrarSeccion('verChiste')">Ver chiste del mes</a></li>
+            <li><a href="#" onclick="mostrarSeccion('enviarChiste')">Enviar un chiste</a></li>
+            <li><a href="#" onclick="mostrarSeccion('comunidad')">Comunidad</a></li>
+        </ul>
+    </nav>
 
-    <!-- Chistes enviados por el usuario -->
-    <div id="seccion-chistes" class="main-box" style="display: none;">
-      <h2>📚 Chistes enviados</h2>
-      <div id="chistes-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-    </div>
+    <main>
+        <!-- Todo tu contenido queda igual -->
+        <section id="verChiste" class="active">
+            <h2>Chiste del Mes</h2>
+            <p id="chisteDelMes">¿Por qué los pájaros no usan Facebook? ¡Porque ya tienen Twitter!</p>
+        </section>
 
-    <!-- Chistes de la comunidad -->
-    <div id="comunidad-chistes" class="main-box" style="display: none;">
-      <h2>🌐 Chistes de la comunidad</h2>
-      <div id="comunidad-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-    </div>
+        <section id="enviarChiste">
+            <h2>Enviar un Chiste</h2>
+            <div id="chisteEnviado" style="display: none;">
+                <p>Ya enviaste un chiste esta semana. Gracias 😊</p>
+            </div>
+            <div id="formularioChiste">
+                <button onclick="mostrarModal()">Agregar un chiste</button>
+            </div>
+        </section>
 
-    <!-- Login/Registro -->
-    <div class="auth-box" id="auth-forms">
-      <h2>Inicia sesión o regístrate</h2>
-      <input type="text" id="username" placeholder="Usuario" />
-      <input type="password" id="password" placeholder="Contraseña" />
-      <button onclick="registrarse()">Registrarse</button>
-      <button onclick="iniciarSesion()">Iniciar sesión</button>
-    </div>
-    <div id="auth-message" style="color: green; margin-top: 1rem;"></div>
-  </main>
+        <section id="comunidad">
+            <h2>Chistes de la Comunidad</h2>
+            <div id="listaChistes"></div>
+        </section>
+    </main>
 
-  <!-- Modal de enviar chiste -->
-  <div id="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
-    <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; width: 90%;">
-      <h2>📝 Enviar tu chiste</h2>
-      <textarea id="nuevo-chiste" rows="4" placeholder="Escribe tu chiste aquí..."></textarea>
-      <button onclick="enviarChiste()">Enviar</button>
-      <button onclick="cerrarModal()" style="margin-top: 0.5rem;">Cancelar</button>
-      <p id="chiste-status" style="color: green;"></p>
+    <!-- Modal (igual que antes) -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <textarea id="nuevoChiste" rows="4" cols="50" placeholder="Escribe tu chiste aquí..."></textarea>
+            <button onclick="enviarChiste()">Enviar</button>
+        </div>
     </div>
-  </div>
+</body>
 
   <!-- JS -->
   <script>
@@ -283,6 +319,15 @@
       const user = localStorage.getItem("loggedInUser");
       if (user) mostrarBienvenida(user);
     };
+    // Sidebar toggle
+document.getElementById("menuToggle").addEventListener("click", function () {
+  document.getElementById("sidebarMenu").classList.add("open");
+});
+
+document.getElementById("closeSidebar").addEventListener("click", function () {
+  document.getElementById("sidebarMenu").classList.remove("open");
+});
+
   </script>
 </body>
 </html>
