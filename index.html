@@ -5,40 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>1RisaXMes</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1rem;
+      height: 100vh;
       background-color: #f4f4f4;
     }
 
-    .container {
+    /* Barra lateral */
+    aside {
+      width: 200px;
+      background: #222;
+      color: white;
+      padding: 1rem;
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 900px;
-      gap: 2rem;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    .main {
-      flex: 2;
-      text-align: center;
+    aside select {
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-box {
       background: white;
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .sidebar {
-      flex: 1;
-      background: #ffffff;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 700px;
+      width: 100%;
+      margin-bottom: 2rem;
     }
 
     input, button, textarea {
@@ -49,75 +63,80 @@
       border: 1px solid #ccc;
     }
 
-    nav {
-      width: 100%;
-      max-width: 900px;
-      margin-bottom: 1rem;
-      background: #222;
-      color: white;
+    .auth-box {
+      background: white;
       padding: 1rem;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .menu select {
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 700px;
     }
 
     @media (max-width: 700px) {
-      .container {
+      body {
         flex-direction: column;
-        gap: 1rem;
+      }
+
+      aside {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+      }
+
+      aside select {
+        width: auto;
+        flex: 1;
+      }
+
+      main {
+        padding: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <nav>
+  <!-- Barra lateral -->
+  <aside>
     <select onchange="manejarMenu(this.value)">
-     <option value="">☰ Menú</option>
-     <option value="enviar">Enviar un chiste</option>
-     <option value="ver">Ver chistes enviados</option>
-     <option value="comunidad">Ver chistes de la comunidad</option>
-     <option value="salir">Cerrar sesión</option>
-</select>
-  </nav>
-  <div class="container">
-    <!-- Chiste del mes -->
-    <div class="main">
+      <option value="">☰ Menú</option>
+      <option value="inicio">Inicio</option>
+      <option value="enviar">Enviar un chiste</option>
+      <option value="ver">Ver chistes enviados</option>
+      <option value="salir">Cerrar sesión</option>
+    </select>
+  </aside>
+
+  <main>
+    <!-- Chiste del mes (siempre visible) -->
+    <div id="inicio" class="main-box">
       <h1>😄 Chiste del mes</h1>
       <p>¿Por qué los pájaros no usan Facebook?<br>Porque ya tienen Twitter.</p>
     </div>
-    <!-- Sección para mostrar chistes -->
-    <div id="seccion-chistes" style="display: none; width: 100%; max-width: 900px; margin-top: 2rem;">
-     <h2>📚 Chistes enviados</h2>
-    <div id="chistes-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-   </div>
-<!-- Sección de comunidad -->
-   <div id="comunidad-chistes" style="display: none; width: 100%; max-width: 900px; margin-top: 2rem;">
-     <h2>🌐 Chistes de la comunidad</h2>
-   <div id="comunidad-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
- </div>
 
-    <!-- Autenticación -->
-    <div class="sidebar">
-      <div id="auth-forms">
-        <h2>Inicia sesión o regístrate</h2>
-        <input type="text" id="username" placeholder="Usuario" />
-        <input type="password" id="password" placeholder="Contraseña" />
-        <button onclick="registrarse()">Registrarse</button>
-        <button onclick="iniciarSesion()">Iniciar sesión</button>
-      </div>
-      <div id="auth-message" style="color: green; margin-top: 1rem;"></div>
+    <!-- Chistes enviados por el usuario -->
+    <div id="seccion-chistes" class="main-box" style="display: none;">
+      <h2>📚 Chistes enviados</h2>
+      <div id="chistes-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
     </div>
-  </div>
 
-  <!-- Modal para enviar chiste -->
+    <!-- Chistes de la comunidad -->
+    <div id="comunidad-chistes" class="main-box" style="display: none;">
+      <h2>🌐 Chistes de la comunidad</h2>
+      <div id="comunidad-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+    </div>
+
+    <!-- Login/Registro -->
+    <div class="auth-box" id="auth-forms">
+      <h2>Inicia sesión o regístrate</h2>
+      <input type="text" id="username" placeholder="Usuario" />
+      <input type="password" id="password" placeholder="Contraseña" />
+      <button onclick="registrarse()">Registrarse</button>
+      <button onclick="iniciarSesion()">Iniciar sesión</button>
+    </div>
+    <div id="auth-message" style="color: green; margin-top: 1rem;"></div>
+  </main>
+
+  <!-- Modal de enviar chiste -->
   <div id="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
     <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; width: 90%;">
       <h2>📝 Enviar tu chiste</h2>
@@ -128,185 +147,142 @@
     </div>
   </div>
 
+  <!-- JS -->
   <script>
-  function registrarse() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    if (!user || !pass) return alert("Completa ambos campos.");
-    if (localStorage.getItem("user_" + user)) return alert("Usuario ya existe.");
-    localStorage.setItem("user_" + user, pass);
-    alert("Registrado correctamente.");
-  }
-
-  function iniciarSesion() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    const stored = localStorage.getItem("user_" + user);
-    if (stored === pass) {
-      localStorage.setItem("loggedInUser", user);
-      mostrarBienvenida(user);
-    } else {
-      alert("Credenciales incorrectas.");
+    function registrarse() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (!user || !pass) return alert("Completa ambos campos.");
+      if (localStorage.getItem("user_" + user)) return alert("Usuario ya existe.");
+      localStorage.setItem("user_" + user, pass);
+      alert("Registrado correctamente.");
     }
-  }
 
-  function mostrarBienvenida(user) {
-    document.getElementById("auth-forms").style.display = "none";
-    document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
-  }
-
- function manejarMenu(valor) {
-  document.getElementById("seccion-chistes").style.display = "none";
-  document.getElementById("comunidad-chistes").style.display = "none";
-
-  if (valor === "salir") {
-    localStorage.removeItem("loggedInUser");
-    location.reload();
-  }
-  if (valor === "enviar") {
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
-    const ultima = localStorage.getItem("chiste_enviado_" + user);
-    if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
-      alert("Solo puedes enviar un chiste por semana.");
-    } else {
-      document.getElementById("modal").style.display = "flex";
+    function iniciarSesion() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const stored = localStorage.getItem("user_" + user);
+      if (stored === pass) {
+        localStorage.setItem("loggedInUser", user);
+        mostrarBienvenida(user);
+      } else {
+        alert("Credenciales incorrectas.");
+      }
     }
-  }
-  if (valor === "ver") {
-    mostrarChistes();
-  }
-  if (valor === "comunidad") {
-    mostrarComunidad();
-  }
-}
 
+    function mostrarBienvenida(user) {
+      document.getElementById("auth-forms").style.display = "none";
+      document.getElementById("auth-message").innerText = `🎉 Bienvenido, ${user}`;
+    }
 
-  function enviarChiste() {
-  const user = localStorage.getItem("loggedInUser");
-  const texto = document.getElementById("nuevo-chiste").value.trim();
-  if (!texto) return alert("Escribe un chiste.");
+    function manejarMenu(valor) {
+      const user = localStorage.getItem("loggedInUser");
+      document.getElementById("inicio").style.display = valor === "inicio" || valor === "" ? "block" : "none";
+      document.getElementById("seccion-chistes").style.display = "none";
+      document.getElementById("comunidad-chistes").style.display = "none";
 
-  let todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+      if (valor === "salir") {
+        localStorage.removeItem("loggedInUser");
+        location.reload();
+      }
+      if (valor === "enviar") {
+        if (!user) return alert("Debes iniciar sesión para enviar un chiste.");
+        const ultima = localStorage.getItem("chiste_enviado_" + user);
+        if (ultima && Date.now() - parseInt(ultima) < 7 * 24 * 60 * 60 * 1000) {
+          alert("Solo puedes enviar un chiste por semana.");
+        } else {
+          document.getElementById("modal").style.display = "flex";
+        }
+      }
+      if (valor === "ver") {
+        if (!user) return alert("Debes iniciar sesión para ver los chistes.");
+        mostrarChistes();
+      }
+    }
 
-  // Evitar duplicados: si ya envió uno, reemplazarlo
-  const yaEnviadoIndex = todos.findIndex(c => c.user === user);
-  if (yaEnviadoIndex !== -1) {
-    todos[yaEnviadoIndex].texto = texto;
-  } else {
-    todos.push({ user, texto });
-  }
+    function enviarChiste() {
+      const user = localStorage.getItem("loggedInUser");
+      const texto = document.getElementById("nuevo-chiste").value.trim();
+      if (!texto) return alert("Escribe un chiste.");
 
-  localStorage.setItem("chiste_enviado_" + user, Date.now());
-  localStorage.setItem("chistes_enviados", JSON.stringify(todos));
-
-  document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
-  
-  // Cerrar modal después de 1 segundo
-  setTimeout(() => {
-    cerrarModal();
-    mostrarChistes(); // Actualiza la lista si estaba viendo
-  }, 1000);
-}
-
-
-  function cerrarModal() {
-    document.getElementById("modal").style.display = "none";
-    document.getElementById("nuevo-chiste").value = "";
-    document.getElementById("chiste-status").innerText = "";
-  }
-
-  function mostrarChistes() {
-  const user = localStorage.getItem("loggedInUser");
-  if (!user) return alert("Debes iniciar sesión para ver los chistes enviados.");
-
-  const contenedor = document.getElementById("seccion-chistes");
-  const lista = document.getElementById("chistes-lista");
-  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
-
-  lista.innerHTML = ""; // Vaciar antes de volver a mostrar
-
-  if (todos.length === 0) {
-    lista.innerHTML = "<p>No hay chistes enviados aún.</p>";
-  } else {
-    todos.forEach((item, index) => {
-      const tarjeta = document.createElement("div");
-      tarjeta.style.background = "white";
-      tarjeta.style.padding = "1rem";
-      tarjeta.style.borderRadius = "10px";
-      tarjeta.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-      tarjeta.style.position = "relative";
-
-      tarjeta.innerHTML = `
-        <strong>${item.user}</strong>
-        <p style="margin-top: 0.5rem;">${item.texto}</p>
-      `;
-
-      // Si el chiste es del usuario actual, mostrar botón de eliminar
-      if (item.user === user) {
-        const btn = document.createElement("button");
-        btn.innerText = "🗑️ Eliminar";
-        btn.style.position = "absolute";
-        btn.style.top = "1rem";
-        btn.style.right = "1rem";
-        btn.style.background = "#f44336";
-        btn.style.color = "white";
-        btn.style.border = "none";
-        btn.style.padding = "0.4rem 0.7rem";
-        btn.style.borderRadius = "5px";
-        btn.style.cursor = "pointer";
-
-        btn.onclick = () => eliminarChiste(index);
-
-        tarjeta.appendChild(btn);
+      let todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+      const yaEnviadoIndex = todos.findIndex(c => c.user === user);
+      if (yaEnviadoIndex !== -1) {
+        todos[yaEnviadoIndex].texto = texto;
+      } else {
+        todos.push({ user, texto });
       }
 
-      lista.appendChild(tarjeta);
-    });
-  }
+      localStorage.setItem("chiste_enviado_" + user, Date.now());
+      localStorage.setItem("chistes_enviados", JSON.stringify(todos));
+      document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
 
-  contenedor.style.display = "block";
-      }
-function eliminarChiste(index) {
-  if (!confirm("¿Seguro que quieres eliminar este chiste?")) return;
-
-  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
-  todos.splice(index, 1); // Eliminar el chiste
-  localStorage.setItem("chistes_enviados", JSON.stringify(todos));
-  mostrarChistes(); // Recargar vista
+      setTimeout(() => {
+        cerrarModal();
+        mostrarChistes();
+      }, 1000);
     }
-function mostrarComunidad() {
-  const contenedor = document.getElementById("comunidad-chistes");
-  const lista = document.getElementById("comunidad-lista");
-  const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
 
-  lista.innerHTML = "";
+    function cerrarModal() {
+      document.getElementById("modal").style.display = "none";
+      document.getElementById("nuevo-chiste").value = "";
+      document.getElementById("chiste-status").innerText = "";
+    }
 
-  if (todos.length === 0) {
-    lista.innerHTML = "<p>Aún no hay chistes en la comunidad.</p>";
-  } else {
-    todos.forEach(item => {
-      const tarjeta = document.createElement("div");
-      tarjeta.style.background = "white";
-      tarjeta.style.padding = "1rem";
-      tarjeta.style.borderRadius = "10px";
-      tarjeta.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-      tarjeta.innerHTML = `
-        <strong>${item.user}</strong>
-        <p style="margin-top: 0.5rem;">${item.texto}</p>
-      `;
-      lista.appendChild(tarjeta);
-    });
-  }
+    function mostrarChistes() {
+      const lista = document.getElementById("chistes-lista");
+      const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+      const user = localStorage.getItem("loggedInUser");
+      lista.innerHTML = "";
 
-  contenedor.style.display = "block";
-}
+      if (todos.length === 0) {
+        lista.innerHTML = "<p>No hay chistes enviados aún.</p>";
+      } else {
+        todos.forEach((item, index) => {
+          const tarjeta = document.createElement("div");
+          tarjeta.style.background = "white";
+          tarjeta.style.padding = "1rem";
+          tarjeta.style.borderRadius = "10px";
+          tarjeta.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+          tarjeta.style.position = "relative";
 
-  window.onload = () => {
-    const user = localStorage.getItem("loggedInUser");
-    if (user) mostrarBienvenida(user);
-  };
-    
-   </script>
+          tarjeta.innerHTML = `<strong>${item.user}</strong><p>${item.texto}</p>`;
+
+          if (item.user === user) {
+            const btn = document.createElement("button");
+            btn.innerText = "🗑️ Eliminar";
+            btn.style.position = "absolute";
+            btn.style.top = "1rem";
+            btn.style.right = "1rem";
+            btn.style.background = "#f44336";
+            btn.style.color = "white";
+            btn.style.border = "none";
+            btn.style.padding = "0.4rem 0.7rem";
+            btn.style.borderRadius = "5px";
+            btn.style.cursor = "pointer";
+            btn.onclick = () => eliminarChiste(index);
+            tarjeta.appendChild(btn);
+          }
+
+          lista.appendChild(tarjeta);
+        });
+      }
+
+      document.getElementById("seccion-chistes").style.display = "block";
+    }
+
+    function eliminarChiste(index) {
+      if (!confirm("¿Seguro que quieres eliminar este chiste?")) return;
+      const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+      todos.splice(index, 1);
+      localStorage.setItem("chistes_enviados", JSON.stringify(todos));
+      mostrarChistes();
+    }
+
+    window.onload = () => {
+      const user = localStorage.getItem("loggedInUser");
+      if (user) mostrarBienvenida(user);
+    };
+  </script>
 </body>
 </html>
