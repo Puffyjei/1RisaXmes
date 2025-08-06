@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>1chisteXmes</title>
+  <title>1RisaXMes</title>
   <style>
     body {
       margin: 0;
@@ -97,6 +97,11 @@
      <h2>📚 Chistes enviados</h2>
     <div id="chistes-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
    </div>
+<!-- Sección de comunidad -->
+   <div id="comunidad-chistes" style="display: none; width: 100%; max-width: 900px; margin-top: 2rem;">
+     <h2>🌐 Chistes de la comunidad</h2>
+   <div id="comunidad-lista" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+ </div>
 
     <!-- Autenticación -->
     <div class="sidebar">
@@ -170,19 +175,32 @@
   }
 
   function enviarChiste() {
-    const user = localStorage.getItem("loggedInUser");
-    const texto = document.getElementById("nuevo-chiste").value.trim();
-    if (!texto) return alert("Escribe un chiste.");
-    localStorage.setItem("chiste_enviado_" + user, Date.now());
+  const user = localStorage.getItem("loggedInUser");
+  const texto = document.getElementById("nuevo-chiste").value.trim();
+  if (!texto) return alert("Escribe un chiste.");
 
-    // Guardar en lista de chistes
-    const todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+  let todos = JSON.parse(localStorage.getItem("chistes_enviados") || "[]");
+
+  // Evitar duplicados: si ya envió uno, reemplazarlo
+  const yaEnviadoIndex = todos.findIndex(c => c.user === user);
+  if (yaEnviadoIndex !== -1) {
+    todos[yaEnviadoIndex].texto = texto;
+  } else {
     todos.push({ user, texto });
-    localStorage.setItem("chistes_enviados", JSON.stringify(todos));
-
-    document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
-    setTimeout(() => cerrarModal(), 1500);
   }
+
+  localStorage.setItem("chiste_enviado_" + user, Date.now());
+  localStorage.setItem("chistes_enviados", JSON.stringify(todos));
+
+  document.getElementById("chiste-status").innerText = "✅ Chiste enviado. Gracias.";
+  
+  // Cerrar modal después de 1 segundo
+  setTimeout(() => {
+    cerrarModal();
+    mostrarChistes(); // Actualiza la lista si estaba viendo
+  }, 1000);
+}
+
 
   function cerrarModal() {
     document.getElementById("modal").style.display = "none";
