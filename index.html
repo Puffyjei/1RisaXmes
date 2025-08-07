@@ -78,7 +78,8 @@
   </style>
 </head>
 <body>
-  <nav style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f4f4f4;">
+<!-- Barra superior -->
+<nav style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f4f4f4; z-index: 1001;">
   <strong>1chisteXmes</strong>
   <button onclick="toggleSidebar()" style="font-size: 1.2rem;">☰ Menú</button>
 </nav>
@@ -94,6 +95,7 @@
     <li><button onclick="manejarMenu('salir')" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">🚪 Cerrar sesión</button></li>
   </ul>
 </div>
+
 
   <div class="container">
     <!-- Chiste del mes -->
@@ -313,8 +315,7 @@ function mostrarComunidad() {
   window.onload = () => {
     const user = localStorage.getItem("loggedInUser");
     if (user) mostrarBienvenida(user);
-  };
-    <script>
+<script>
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.style.left = sidebar.style.left === "0px" ? "-250px" : "0px";
@@ -324,6 +325,8 @@ function irAInicio() {
   window.scrollTo({ top: 0, behavior: "smooth" });
   toggleSidebar();
 }
-   </script>
+</script>
+
+   
 </body>
 </html>
