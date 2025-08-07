@@ -78,15 +78,23 @@
   </style>
 </head>
 <body>
-  <nav>
-    <select onchange="manejarMenu(this.value)">
-     <option value="">☰ Menú</option>
-     <option value="enviar">Enviar un chiste</option>
-     <option value="ver">Ver chistes enviados</option>
-     <option value="comunidad">Ver chistes de la comunidad</option>
-     <option value="salir">Cerrar sesión</option>
-</select>
-  </nav>
+  <nav style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f4f4f4;">
+  <strong>1chisteXmes</strong>
+  <button onclick="toggleSidebar()" style="font-size: 1.2rem;">☰ Menú</button>
+</nav>
+
+<!-- Sidebar deslizante -->
+<div id="sidebar" style="position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background: #222; color: white; padding: 1rem; box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: left 0.3s; z-index: 1000;">
+  <h2 style="margin-top: 0;">Menú</h2>
+  <ul style="list-style: none; padding: 0;">
+    <li><button onclick="irAInicio()" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">🏠 Inicio</button></li>
+    <li><button onclick="manejarMenu('enviar')" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">📝 Enviar chiste</button></li>
+    <li><button onclick="manejarMenu('ver')" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">📋 Ver chistes enviados</button></li>
+    <li><button onclick="manejarMenu('comunidad')" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">🌐 Chistes de la comunidad</button></li>
+    <li><button onclick="manejarMenu('salir')" style="all: unset; color: white; cursor: pointer; display: block; margin: 1rem 0;">🚪 Cerrar sesión</button></li>
+  </ul>
+</div>
+
   <div class="container">
     <!-- Chiste del mes -->
     <div class="main">
@@ -306,7 +314,16 @@ function mostrarComunidad() {
     const user = localStorage.getItem("loggedInUser");
     if (user) mostrarBienvenida(user);
   };
-    
+    <script>
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.style.left = sidebar.style.left === "0px" ? "-250px" : "0px";
+}
+
+function irAInicio() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  toggleSidebar();
+}
    </script>
 </body>
 </html>
